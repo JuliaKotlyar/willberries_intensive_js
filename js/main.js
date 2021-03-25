@@ -23,12 +23,9 @@ const closeModal = function () {
 
 buttonCart.addEventListener('click', openModal);
 
-modalCart.addEventListener('click', (event) => {
+modalCart.addEventListener('click', event => {
     const target = event.target;
-    if (
-        target.classList.contains('overlay') ||
-        target.classList.contains('modal-close')
-    ) {
+    if (target.classList.contains('overlay') || target.classList.contains('modal-close')) {
         closeModal();
     }
 });
@@ -38,7 +35,7 @@ modalCart.addEventListener('click', (event) => {
     const scrollLinks = document.querySelectorAll('a.scroll-link');
 
     for (const scrollLink of scrollLinks) {
-        scrollLink.addEventListener('click', (event) => {
+        scrollLink.addEventListener('click', event => {
             event.preventDefault();
             const id = scrollLink.getAttribute('href');
             document.querySelector(id).scrollIntoView({
@@ -51,9 +48,11 @@ modalCart.addEventListener('click', (event) => {
 
 //goods
 
-const more = document.querySelector('.more');
-const navigationLink = document.querySelectorAll('.navigation-link');
+const navigationLink = document.querySelectorAll('.navigation-link:not(.view-all)');
+const viewAll = document.querySelectorAll('.view-all');
 const longGoodsList = document.querySelector('.long-goods-list');
+const showAcsessories = document.querySelectorAll('.show-acsessories');
+const showClothing = document.querySelectorAll('.show-clothing');
 
 const getGoods = async function () {
     const result = await fetch('db/db.json');
@@ -62,7 +61,7 @@ const getGoods = async function () {
     }
     return await result.json();
 };
-const createCard = function ({label, img, name, description, id, price}) {
+const createCard = function ({ label, img, name, description, id, price }) {
     const card = document.createElement('div');
     card.className = 'col-lg-3 col-sm-6';
 
@@ -87,15 +86,21 @@ const renderCards = function (data) {
     document.body.classList.add('show-goods');
 };
 
-more.addEventListener('click', function (event) {
+// nav All
+
+const showAll = function (event) {
     event.preventDefault();
     getGoods().then(renderCards);
+};
+
+viewAll.forEach(function (elem) {
+    elem.addEventListener('click', showAll);
 });
 
 const filterCards = function (field, value) {
     getGoods()
         .then(function (data) {
-            const filteredGoods = data.filter(function (good) {
+            return data.filter(function (good) {
                 return good[field] === value;
             });
             return filteredGoods;
@@ -109,5 +114,21 @@ navigationLink.forEach(function (link) {
         const field = link.dataset.field;
         const value = link.textContent;
         filterCards(field, value);
+    });
+});
+
+// view all buttons
+
+showAcsessories.forEach(item => {
+    item.addEventListener('click', event => {
+        event.preventDefault();
+        filterCards('category', 'Accessories');
+    });
+});
+
+showClothing.forEach(item => {
+    item.addEventListener('click', event => {
+        event.preventDefault();
+        filterCards('category', 'Clothing');
     });
 });
