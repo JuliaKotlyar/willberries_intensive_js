@@ -19,6 +19,8 @@ const showAcsessories = document.querySelectorAll('.show-acsessories');
 const showClothing = document.querySelectorAll('.show-clothing');
 const cartTableGoods = document.querySelector('.cart-table__goods');
 const cardTableTotal = document.querySelector('.card-table__total');
+const cartCount = document.querySelector('.cart-count');
+const btnDanger = document.querySelector('.btn-danger');
 
 const getGoods = async () => {
     const result = await fetch('db/db.json');
@@ -30,6 +32,18 @@ const getGoods = async () => {
 
 const cart = {
     cartGoods: [],
+
+    countQuanity() {
+        cartCount.textContent = this.cartGoods.reduce((sum, item) => {
+            return sum + item.count;
+        }, 0);
+    },
+
+    clearCart() {
+        this.cartGoods.length = 0;
+        this.countQuanity();
+        this.renderCart();
+    },
 
     renderCart() {
         cartTableGoods.textContent = '';
@@ -57,6 +71,7 @@ const cart = {
     deleteGood(id) {
         this.cartGoods = this.cartGoods.filter(item => id !== item.id);
         this.renderCart();
+        this.countQuanity();
     },
     minusGood(id) {
         for (const item of this.cartGoods) {
@@ -70,6 +85,7 @@ const cart = {
             }
         }
         this.renderCart();
+        this.countQuanity();
     },
 
     plusGood(id) {
@@ -80,6 +96,7 @@ const cart = {
             }
         }
         this.renderCart();
+        this.countQuanity();
     },
     addCartGoods(id) {
         const goodItem = this.cartGoods.find(item => item.id === id);
@@ -95,10 +112,15 @@ const cart = {
                         price,
                         count: 1,
                     });
+                    this.countQuanity();
                 });
         }
     },
 };
+
+btnDanger.addEventListener('click', () => {
+    cart.clearCart();
+});
 
 document.body.addEventListener('click', event => {
     const addToCart = event.target.closest('.add-to-cart');
